@@ -1,0 +1,715 @@
+<!-- SVG DRAG DROP -->
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SVG VIEWER AND ACCESSIBILITY TOOL</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<style type="text/css">
+
+body{
+  background-color:rgba(240,240,240,.5);
+}
+.wrapperSVGtool{
+  min-width: 940px;
+  max-width: 939px;
+  width:100%;
+  display: block;
+  margin:0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+  flex-direction: column;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  position: relative;
+  text-align: center;
+  opacity:1;
+}
+.wrapperSVGtool small{
+  font-size: 9px;
+  margin:0 auto;
+}
+span.dragSvgHere{
+	content:'Drag SVG in here';
+	font-size: 2.1rem;
+    margin: .5rem 3rem 1rem;
+    color:grey;
+    white-space:nowrap;
+}
+h1{text-transform: uppercase;text-shadow: 1px 5px 5px rgba(0,15,1,.2);}
+.h1Title{
+  margin-top:3%;
+}
+#filereader{
+  margin:0 auto;
+  display:inline-block;
+  min-width:400px;
+  min-height: 200px;
+  max-width:99%;
+  max-height:99%;
+  background-color:hsla(31,15%,50%,.1);
+  box-shadow: 2px 2px 10px black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius:3%;
+  border-style:dashed;
+}
+.wrapperSVGtool h1{
+	font-size: 2.5em;
+    margin: .5em auto 1em;
+}
+
+#myCanvas{
+  background-color:rgba(122,122,122,.1);
+}
+.fileInfo {
+    position: relative;
+    font-size: 1.5rem;
+    color: #001122;
+    display: block;
+    margin: 0 auto 5% auto;
+    background-color: hsla(31,15%,50%,.1);
+    width: 90%;
+    height: 91px;
+    border: 1px solid rgba(122,122,122,.2);
+    box-shadow: 3px 3px rgba(122,122,122,.2);
+    text-align: left;
+}
+.fileInfo > span {
+    padding-left: 10px;
+    font-weight: bold;
+}
+a {
+    text-decoration: none;
+}
+.button_primary {
+    position: absolute;
+    left: 75%;
+    top: 0;
+    width: 12%;
+    margin-top: 10px;
+    box-shadow: 2px 3px 9px rgba(0,0,0,.7);
+}
+.button_primary {
+    display: block;
+    border: 2px solid #000d42;
+    background-color: #000d42;
+    text-align: center;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: Helvetica, Arial, Roboto, sans-serif;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 0.39em;
+}
+.button_primary:hover{
+  cursor: pointer;
+}
+.export{
+    width: auto;
+    background-color: #d14836;
+    border-color:#d14836;
+    outline: 0;
+  }
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes colorChange {
+    from {color:rgba(255,255,17,1);}
+    to {color:rgba(249,153,153,1);}
+}
+@keyframes colorChange {
+ from {color:rgba(255,255,17,1);}
+    to {color:rgba(249,153,153,1);} 
+}
+  button:hover{
+    background-color:rgba(221,68,34,1);
+   border-color:rgba(221,68,34,1);
+     -webkit-animation: colorChange 2s ease-in-out;  /* Safari 4.0 - 8.0 */
+    -webkit-animation-iteration-count: infinite; /* Safari 4.0 - 8.0 */
+    animation: colorChange 2s ease-in-out;
+    animation-iteration-count: infinite;
+  }
+input#file {
+    height: 192px;
+    width: 450px;
+}
+input#file:after {
+    display: block;
+    content: 'Drag SVG here';
+    font-size: 3rem;
+    text-align: center;
+    margin: .5rem 3rem 1rem;
+    color: grey;
+    white-space: nowrap;
+}
+#filereader input[type='text']{
+    position: absolute;
+    top: 0;
+    left: 18%;
+    padding: .3%;
+    width: 130px;
+    margin-top: 10px;
+    box-shadow: 2px 3px 9px rgba(0,0,0,.7);
+}
+#filereader textarea{
+  position: absolute;
+  top: 0;
+  left: 34%;
+  padding: .3%;
+  width: 200px;
+  resize: none;
+  height: 32px;
+  margin-top: 10px;
+  box-shadow: 2px 3px 9px rgba(0,0,0,.7);
+}
+button#export {
+  position: absolute;
+  top: 0;
+  left: 59%;
+  margin-top: 10px;
+  box-shadow: 2px 3px 9px rgba(0,0,0,.7);
+}
+input[type="text"]:focus, #filereader textarea:focus {
+    background-color: rgba(0,255,255,.1);
+    font-weight: bold;
+    font-size:12px;
+     -webkit-transition: all .25s;
+    transition: all .25s;
+}
+.pos1{
+  position: absolute;
+  left: 44%;
+  top: 26.5%;
+  width: 12%;
+}
+.exportArea{
+    background-color: rgba(128, 128, 128,.75);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+span.closeCode:after {
+    content: 'X';
+    font-size: 20px;
+    color: #fdfafa;
+    position: absolute;
+    top: 15.5%;
+    left: 65%;
+    border: 2px solid #fdfafa;
+    border-radius: 50%;
+    padding: 1px 9px;
+    font-weight: bold;
+    z-index: 11;
+     -webkit-transition: all .5s;
+    transition: all .5s;
+    box-shadow: 2px 3px 13px dimgrey;
+}
+.closeCode:hover{
+  cursor: pointer;
+}
+div#svgexport {
+    width: 400px;
+    overflow: scroll;
+    height: 250px;
+    outline: 2px solid grey;
+    position: absolute;
+    top: 23%;
+    background-color: white;
+    left: 25%;
+    box-shadow: 8px 10px 33px black;
+}
+#svgexport code {
+    padding: 2px 4px;
+    font-size: 90%;
+    color: #c7254e;
+    background-color: #f9f2f4;}
+.load-target {
+    max-width: 940px;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+/* file size info */
+.success{
+  color:#5cb85c;
+}
+.warning{
+  color:#ed9415;
+}
+.danger{
+  color:#d9534f;
+}
+.loadingSvg{
+position: absolute;
+top: 25%;
+left: 50%;
+display:none;
+}
+.selectable {
+  -webkit-user-select: all;  /* Chrome all / Safari all */
+  -moz-user-select: all;     /* Firefox all */
+  -ms-user-select: all;      /* IE 10+ */
+  user-select: all;          /* Likely future */      
+}
+</style>
+</head>
+<body>
+  <div class="wrapperSVGtool">
+    <div class="h1Title">
+    <h1>SVG viewer &amp; accessibility tool</h1>
+    </div>
+    <div class="fileInfo hidfirst">
+      <span class="fileSize"></span><br>
+       <span class="fileWidth"></span>
+      <span class="fileHeight"></span>
+      <span class="fileName"></span>
+   </div>    
+    <form id="filereader">
+      <input class="choosesvg hidafter" id="file" type="file" accept=".svg, image/svg+xml" name="file" value="Choose SVG">
+        <div class="hidfirst " style="display: none;">
+          <input id="titleTextInput" type="text" name="name" placeholder="Name it (Title)">
+        </div>
+        <div class="hidfirst" style="display: none;">
+          <textarea id="descTextInput" name="summary" placeholder="Describe the text or image"></textarea>
+        </div>
+        <div class="hidfirst" style="display: none;">
+          <div class="load-target"></div>
+        <button id="export" class="export button_primary">export svg code</button>
+      </div>
+    </form>
+    <div class="error" style="display: none;">
+        <button class="clear button_primary pos1">Clear canvas</button>
+      </div>
+      <span class="closeCode" style="display: none;"></span>
+      <div class="exportArea" style="display: none;">
+       <div id="svgexport"><code></code></div>  
+      </div>
+    <br>
+    <small>Version: 1.1</small>
+    <small>Author: <a href="http://www.avishai84.com">Avishai Taashur</a></small>
+      <div class="loadingSvg"><img src="https://loading.io/spinners/pacman/index.eat-bean-pie-loading-gif.gif" alt="loading"></div>
+  </div>
+</body>
+
+<script type="text/javascript">
+
+var is_chrome = /chrome/.test( navigator.userAgent.toLowerCase() );
+if(is_chrome != true){
+  var bdy = document.querySelector('body');
+  bdy.innerHTML = '<div style="background-color:#fff;color:black;border:2px solid black;width:100%;height:300px;font-size:28px;font-weight:bold;text-align:center;margin:5% auto;">Sorry, this app. only works on Chrome browser.<br> <img src="https://www.google.com/chrome/assets/common/images/chrome_logo_2x.png?mmfb=a5234ae3c4265f687c7fffae2760a907" alt="chrome"></div>';
+
+}
+
+//insert input fields value
+  var titleTextInput,
+       descTextInput,
+       randNumId,
+       computedWidth,
+       computedHeight;
+      
+//create random number attached to ARIA ID to prevent confilcts 
+(function createRanNumId(){
+    var flr;
+    randNumId = Math.abs(Math.random() * 200000);
+     flr = Math.floor(randNumId); randNumId = flr.toString();
+    return randNumId;
+  }()); 
+//making text selectable
+function selectable(){
+jQuery('#svgexport > code').on('click', function(){
+  var that = jQuery(this);
+  if(!that.is('.selectable')){
+    that.addClass('selectable');
+  }
+});
+}
+
+// refresh page
+var clearBtn= document.querySelectorAll('.wrapperSVGtool .clear');
+function clearCanvasUrl(){
+  jQuery(clearBtn).on('click', function(){
+  var path = location.pathname;
+  location.search = '';
+  location.href= path;
+});
+}  
+
+
+//export function
+var exprtAreaCode = document.querySelector('.exportArea'),
+    closeCode = document.querySelector('.closeCode'),
+    svgContentCode,
+    createTitle = document.createElement('title'),
+    createDesc = document.createElement('desc'),
+    aria = document.createAttribute('aria-labelledby');
+    aria.value = 'title'+randNumId+' '+'desc'+randNumId;
+
+function exportClickReady(exprtAreaCode, callback){
+
+  this.exprtAreaCode = exprtAreaCode;
+  jQuery('#export').click(function(e) {
+    e.preventDefault(); 
+
+    var xml = jQuery('.load-target'), 
+        svgCode, loadingSvg = jQuery('.loadingSvg');
+        //show loader
+        loadingSvg.show();
+        var closeX = jQuery('span.closeCode').after();
+    (function appendAccessibility(){
+      var svgDesc,svgTitle;
+
+    svgContentCode = document.querySelector('.load-target svg');
+
+    //insert input fields value
+    titleTextInput = jQuery('#titleTextInput').val();
+    descTextInput = jQuery('#descTextInput').val();
+    createTitle.id='title'+randNumId;//title
+    createDesc.id='desc'+randNumId;//desc
+
+    svgContentCode.insertBefore(createDesc,svgContentCode.firstElementChild);
+    svgContentCode.insertBefore(createTitle,svgContentCode.firstElementChild);
+    svgDesc = document.querySelector('.load-target svg desc#desc'+randNumId);
+    svgTitle = document.querySelector('.load-target svg title#title'+randNumId);
+    svgContentCode.setAttributeNode(aria);
+    if (svgDesc.innerText !== '' || svgTitle.innerText !== ''){
+      svgDesc.innerText = '';
+      svgTitle.innerText = '';
+    }
+
+    svgTitle.append(titleTextInput);
+    svgDesc.append(descTextInput);
+     svgCode = xml[0].innerHTML;
+    return svgCode;
+    }());
+
+    jQuery(closeX).fadeIn('fast');
+    jQuery('#svgexport code').html(svgCode.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'));
+
+    jQuery(exprtAreaCode).fadeIn('fast', function(){
+      //remove loading gif
+     loadingSvg.fadeOut('fast');
+     //selecting text on click
+  selectable();
+    });
+    closeCodeArea(exprtAreaCode, closeCode);
+  }); 
+}
+exportClickReady(exprtAreaCode);
+  // close code to copy window 
+
+  function closeCodeArea(closeCode, exprtAreaCode){
+    this.closeCode = closeCode;
+    this.exprtAreaCode = exprtAreaCode;
+    var closeX = jQuery('span.closeCode').after();
+    jQuery(closeX).click(function(e) {
+      jQuery(closeCode).fadeOut('fast');
+      jQuery(exprtAreaCode).fadeOut('fast');
+
+    });
+  }
+
+
+ var out$ = typeof exports != 'undefined' && exports || this;
+
+  var doctype = '<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">';
+  function errors(el){
+    var el = el,
+    txtArea = jQuery('#filereader');
+    jQuery(txtArea).html('wrong file type: ' + el + '<br>' + 'only SVG is accepted');
+    clearCanvasUrl();
+    jQuery('.wrapperSVGtool').find('.error').show();
+  }
+
+  function handleFileSelect(event) {
+    var el, fileName;
+    el = event;
+    if(event.type === 'drop'){
+       fileName = '';
+      return fileName;  
+    }else{
+     fileName = el.target.files[0].name;
+    }
+
+    function getExtention(fileName){
+      var i, j;
+
+      fileName = el.target.files[0].name;
+      i = fileName.lastIndexOf('.');
+     
+       if(i === -1 ) return false;
+       j = fileName.slice(i);
+       fileName = j;
+
+     if(fileName === '.svg' || fileName === '.SVG' ){
+          if(jQuery('.wrapperSVGtool').find('.error> button').hasClass('pos1')){
+            jQuery('.wrapperSVGtool').find('.error> button').removeClass('pos1');
+          }
+          return false;
+     }else{
+        return errors(fileName);
+     }
+  
+ 
+   }
+  getExtention(fileName);
+
+    var $el = jQuery('#filereader'),
+        files = event.target.files,
+        i,
+        f,
+        imgSize,
+        imgName,
+        finalSize,
+        fileInfoDiv = document.querySelector('.fileInfo'),
+        fSize = document.querySelector('.fileSize'),
+        fName = document.querySelector('.fileName'),
+        finalSize,
+        textS,
+        textN,
+        binarySize= 'KB',
+        sizeStatusHtml,
+        classStatusHtml; // .success .warning .danger
+
+    for (i = 0; f = files[i]; i+=1) {
+      var reader = new FileReader();
+      reader.onload = (function(file) {
+        // Output img size, name
+
+      imgSize = file.size,
+      imgName = file.name,
+      finalSize = parseFloat(Math.round(imgSize)/1000).toFixed(2);
+
+      // less then 195KB
+      if(imgSize <= 199680){
+        (function(){
+          sizeStatusHtml = 'OK';
+          classStatusHtml= 'success';
+          return sizeStatusHtml, classStatusHtml;
+        }());
+        //200KB or greater but less than 225KB
+      }else if(imgSize > 204800 && imgSize <= 230400){
+        (function(){
+          sizeStatusHtml = 'WARNING';
+          classStatusHtml= 'warning';
+          return sizeStatusHtml, classStatusHtml;
+        }());
+        //over 225KB
+      }else if(imgSize > 230400){
+        (function(){
+          sizeStatusHtml = 'OVERSIZED';
+          classStatusHtml= 'danger';
+          return sizeStatusHtml, classStatusHtml;
+        }());
+      }
+      textS = ('File Size: '+finalSize+binarySize);
+      textN = ('File Name: '+imgName);
+      fSize.innerHTML = '';
+      fName.innerHTML = '';
+      fSize.append(textS);
+      fName.append(textN);
+      var fsizeSpan = document.querySelector('span.fileSize');
+      fsizeSpan.insertAdjacentHTML('afterend','<span class="'+classStatusHtml+'">'+sizeStatusHtml+'</span>');
+        //get width height after show
+        jQuery(fileInfoDiv).show(function(){
+          var targetSvg, attrbts, fWid, fHeigh, br = "<br>";
+              fWid = jQuery('.fileInfo > span.fileWidth');
+              fHeigh = jQuery('.fileInfo > span.fileHeight');
+              targetSvg = jQuery('.load-target svg');
+              if(targetSvg.length > 0){
+                attrbts = targetSvg[0].attributes;
+                if(attrbts != undefined || attrbts != null || attrbts != NaN){
+                  computedWidth = attrbts.width.nodeValue;
+                  computedHeight = attrbts.height.nodeValue;
+                  if(computedWidth != undefined || computedHeight != undefined){
+                    fWid.append('SVG Width: '+computedWidth);
+                    jQuery('<br>').insertAfter(fWid);
+                    fHeigh.append('SVG Height: '+computedHeight);
+                    jQuery('<br>').insertAfter(fHeigh);
+                  }
+                }
+              }else{
+                  jQuery(fWid).remove();
+                  jQuery(fHeigh).remove();
+              }   
+        });
+        return function(e) {
+          $el.find('.load-target').html(e.target.result);
+          svgAsDataUri($el.find('.load-target svg')[0], null, function(uri) {
+            jQuery('.hidafter').hide();
+            $el.find('.hidfirst').show();
+            //clear btn
+            clearCanvasUrl();
+            jQuery('.wrapperSVGtool').find('.error').show();
+          });
+        }
+      })(f);
+      reader.readAsText(f);
+    }
+  }
+
+function inlineImages(el, callback) {
+   var images,left, i; 
+  if(el != undefined){
+     images = el.querySelectorAll('image');
+     left = images.length;
+    if (left == 0) {
+      callback();
+    }
+    for (i = 0; i < images.length; i+=1) {
+      (function(image) {
+        var href = image.getAttribute('xlink:href');
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var img = new Image();
+        href = href || image.getAttribute('href');
+        img.src = href;
+        img.onload = function() {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          image.setAttribute('xlink:href', canvas.toDataURL('image/png'));
+          left--;
+          if (left == 0) {
+            callback();
+          }
+        }
+
+      })(images[i]);
+    }
+  }else{
+    return false;
+  }
+}
+
+
+  function styles(el, selectorRemap) {
+    var css = "",
+        sheets = document.styleSheets,
+        i,j;
+    for (i = 0; i < sheets.length; i+=1) {
+      // if (isExternal(sheets[i].href)) {
+      //   console.warn("Cannot include styles from other hosts: "+sheets[i].href);
+      //   continue;
+      // }
+      var rules = sheets[i].cssRules;
+      if (rules != null) {
+        for ( j = 0; j < rules.length; j+=1) {
+          var rule = rules[j];
+          if (typeof(rule.style) != "undefined") {
+            var match = null;
+            try {
+              match = el.querySelector(rule.selectorText);
+            } catch(err) {
+              console.warn('Invalid CSS selector "' + rule.selectorText + '"', err);
+            }
+            if (match) {
+              var selector = selectorRemap ? selectorRemap(rule.selectorText) : rule.selectorText;
+              css += selector + " { " + rule.style.cssText + " }\n";
+            } else if(rule.cssText.match(/^@font-face/)) {
+              css += rule.cssText + '\n';
+            }
+          }
+        }
+      }
+    }
+    return css;
+  }
+
+//event listeners 
+
+  if (window.File && window.FileReader && window.FileList && window.Blob) {
+    document.getElementById('file').addEventListener('change', handleFileSelect,false);
+
+    document.getElementById('file').addEventListener("dragover", function(e){
+    document.getElementById('file').style.border = '10px solid yellow';
+    e.preventDefault();}, true);
+    document.getElementById('file').addEventListener("dragleave", function(e){
+    document.getElementById('file').style.border = '';
+    e.preventDefault();}, true);
+
+    document.getElementById('file').addEventListener("drop",handleFileSelect, function(event){
+
+    document.getElementById('file').style.border = '';
+
+    },true);
+
+  }
+
+
+
+
+out$.svgAsDataUri = function(el, options, cb) {
+    options = options || {};
+    options.scale = options.scale || 1;
+    var xmlns = "http://www.w3.org/2000/xmlns/";
+
+    inlineImages(el, function() {
+      var outer = document.createElement("div");
+      var clone = el.cloneNode(true);
+      var width, height;
+      if(el.tagName == 'svg') {
+        width = parseInt(clone.getAttribute('width') || clone.style.width || out$.getComputedStyle(el).getPropertyValue('width'));
+        height = parseInt(clone.getAttribute('height') || clone.style.height || out$.getComputedStyle(el).getPropertyValue('height'));
+
+      } else {
+        var box = el.getBBox();
+        width = box.x + box.width;
+        height = box.y + box.height;
+        clone.setAttribute('transform', clone.getAttribute('transform').replace(/translate\(.*?\)/, ''));
+
+        var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+        svg.appendChild(clone);
+        clone = svg;
+ 
+        /* find the SVG code, insert ARIA to the header. Append input to the correct
+          title and desc. fields.
+        */
+    var svgData = theCodeSpace.children[0].firstChild;
+      }
+
+      clone.setAttribute("version", "1.1");
+      clone.setAttributeNS(xmlns, "xmlns", "http://www.w3.org/2000/svg");
+      clone.setAttributeNS(xmlns, "xmlns:xlink", "http://www.w3.org/1999/xlink");
+      clone.setAttribute("width", width * options.scale);
+      clone.setAttribute("height", height * options.scale);
+      clone.setAttribute("viewBox", "0 0 " + width + " " + height);
+      // this is where the input text will go
+      clone.setAttribute("aria-labelledby", "title desc");
+
+      outer.appendChild(clone);
+
+      var css = styles(el, options.selectorRemap);
+      var s = document.createElement('style');
+      s.setAttribute('type', 'text/css');
+      s.innerHTML = "<![CDATA[\n" + css + "\n]]>";
+      var defs = document.createElement('defs');
+      defs.appendChild(s);
+      clone.insertBefore(defs, clone.firstChild);
+
+      var svg = doctype + outer.innerHTML;
+      // console.log(svg);
+      var uri = 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svg)));
+      if (cb) {
+        cb(uri);
+      }
+    });
+  }
+
+
+  jQuery( document ).ready(function() {
+    jQuery('.hidfirst').hide();
+        
+  });
+
+
+</script>
+</html>
